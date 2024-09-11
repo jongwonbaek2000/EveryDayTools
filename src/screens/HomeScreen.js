@@ -1,35 +1,46 @@
 import React from 'react';
-import {View, Text, Button, StyleSheet, Image} from 'react-native';
+import {
+  View,
+  Text,
+  Button,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
 import palette from '../styles/colors/colorPalette';
 function HomeScreen({navigation}) {
   return (
     <View style={styles.block}>
       <Text style={styles.headerText}>일상의 툴들</Text>
       <View style={[styles.smallLine, {paddingBottom: 20}]} />
-      <View style={styles.box}>
-        <Image
-          style={{marginLeft: 15}}
-          source={require('../../assets/icons/matching-image.jpg')}
-        />
-        <View style={styles.boxInBoxForText}>
-          <Text style={styles.itemTitle}>선호도 매칭</Text>
-          <View
-            style={[
-              styles.smallLine,
-              {marginBottom: 10, marginHorizontal: 'auto'},
-            ]}
+      <TouchableOpacity
+        activeOpacity={0.6}
+        onPress={() => navigation.navigate('Algorithm')}>
+        <View style={styles.box}>
+          <Image
+            style={{marginLeft: 15}}
+            source={require('../../assets/icons/matching-image.jpg')}
           />
-          <Text style={styles.itemSubTitle}>설명</Text>
-          <Text style={styles.itemText}>
-            소개팅, 직원과 지점 매칭, 기숙사 배정, 장기 기증 등의 문제에 활용
-            가능!
-          </Text>
-          <Text style={styles.itemSubTitle}>입력값</Text>
-          <Text style={styles.itemText}>
-            신청자 개수, 선택자 개수, 각 신청자와 선택자의 선호도
-          </Text>
+          <View style={styles.boxInBoxForText}>
+            <Text style={styles.itemTitle}>선호도 매칭</Text>
+            <View
+              style={[
+                styles.smallLine,
+                {marginBottom: 10, marginHorizontal: 'auto'},
+              ]}
+            />
+            <Text style={styles.itemSubTitle}>설명</Text>
+            <Text style={styles.itemText}>
+              소개팅, 직원과 지점 매칭, 기숙사 배정, 장기 기증 등의 문제에 활용
+              가능!
+            </Text>
+            <Text style={styles.itemSubTitle}>입력값</Text>
+            <Text style={styles.itemText}>
+              신청자 개수, 선택자 개수, 각 신청자와 선택자의 선호도
+            </Text>
+          </View>
         </View>
-      </View>
+      </TouchableOpacity>
       {/* <Button
         title="선호도 매칭"
         onPress={() => navigation.push('Detail', {id: 1})}

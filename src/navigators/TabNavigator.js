@@ -40,7 +40,7 @@ function TabNavigator() {
         }}
       />
       <Tab.Screen
-        name="Algorithm"
+        name="AlgorithmStack"
         component={AlgorithmStackNavigator}
         options={{
           title: '알고리즘 설명',
