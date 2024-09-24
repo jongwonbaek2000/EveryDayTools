@@ -20,7 +20,7 @@ function TabNavigator() {
       initialRouteName="HomeTab"
       screenOptions={{
         headerShown: false,
-        tabBarStyle: {height: 55},
+        tabBarStyle: {height: 60},
         tabBarLabelStyle: {fontSize: 12, paddingBottom: 6},
         tabBarActiveTintColor: palette.primary,
       }}>

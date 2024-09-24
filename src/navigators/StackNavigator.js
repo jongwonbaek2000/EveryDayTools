@@ -2,7 +2,9 @@ import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import TabNavigator from './TabNavigator';
 import AlgorithmScreen from '../screens/AlgorithmScreen';
-import GroupSetting from '../screens/GroupSetting';
+import GroupSettingScreen from '../screens/GroupSettingScreen';
+import InputPreferenceScreen from '../screens/InputPreferenceScreen';
+import OutputScreen from '../screens/OutputScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -21,8 +23,18 @@ function StackNavigator() {
       />
       <Stack.Screen
         name="GroupSetting"
-        component={GroupSetting}
+        component={GroupSettingScreen}
         options={{title: '그룹 세팅'}}
+      />
+      <Stack.Screen
+        name="InputPreference"
+        component={InputPreferenceScreen}
+        options={{title: '선호도 입력'}}
+      />
+      <Stack.Screen
+        name="Output"
+        component={OutputScreen}
+        options={{title: '선호도 입력'}}
       />
     </Stack.Navigator>
   );

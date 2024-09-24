@@ -1,6 +1,7 @@
 import React from 'react';
 import {StyleSheet, Text, TouchableOpacity} from 'react-native';
 import palette from '../styles/colors/colorPalette';
+import layout from '../styles/layouts/layout';
 
 function BottomButton({title, onPress}) {
   return (
@@ -8,15 +9,17 @@ function BottomButton({title, onPress}) {
       activeOpacity={0.6}
       onPress={onPress}
       style={styles.bottom}>
-      <Text style={{fontSize: 18, color: 'white'}}>{title}</Text>
+      <Text style={{fontSize: 18, color: 'white', margin: 'auto'}}>
+        {title}
+      </Text>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   bottom: {
-    width: 312,
-    height: 41,
+    width: `${layout.widthSystem * 100}%`,
+    height: 48,
     backgroundColor: palette.primary,
     marginBottom: 20,
     justifyContent: 'center',
