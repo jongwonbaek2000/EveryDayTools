@@ -1,8 +1,8 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect, useContext, useState} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import AutoHeightImage from 'react-native-auto-height-image';
 import palette from '../styles/colors/colorPalette';
-
+import {PreferencesContext} from '../providers/PreferencesProvider';
 const unselectedName = '미선택';
 
 const ICON_PATHS = {
@@ -19,18 +19,7 @@ const getIconSource = (name, isModalVisible, isCompleteItem, prefNumber) => {
   return ICON_PATHS.DEFAULT;
 };
 
-const PreferenceGroup = ({
-  group,
-  title,
-  subtitle,
-  items,
-  onPressModalOpen,
-  isModalVisible,
-  focusedItem,
-  addItemToPrefs,
-  preferences,
-  isCompleteItems,
-}) => {
+const PreferenceGroup = ({group, title, subtitle, items}) => {
   // 10개 미만의 아이템일 경우 '미선택' 항목을 채워 넣음
   const fullItems = [...items];
   while (fullItems.length < 10) {
@@ -45,135 +34,96 @@ const PreferenceGroup = ({
           <Text style={styles.textSmall}>{subtitle}</Text>
         </View>
       )}
-      <ItemsRow
-        group={group}
-        items={fullItems.slice(0, 5)}
-        focusedItem={focusedItem}
-        isModalVisible={isModalVisible}
-        onPressModalOpen={onPressModalOpen}
-        addItemToPrefs={addItemToPrefs}
-        preferences={preferences}
-        isCompleteItems={isCompleteItems}
-      />
-      <ItemsRow
-        group={group}
-        items={fullItems.slice(5)}
-        focusedItem={focusedItem}
-        isModalVisible={isModalVisible}
-        onPressModalOpen={onPressModalOpen}
-        addItemToPrefs={addItemToPrefs}
-        preferences={preferences}
-        isCompleteItems={isCompleteItems}
-      />
+      <ItemsRow group={group} items={fullItems.slice(0, 5)} />
+      <ItemsRow group={group} items={fullItems.slice(5)} />
     </View>
   );
 };
 
-const ItemsRow = React.memo(
-  ({
-    group,
-    items,
+const ItemsRow = React.memo(({group, items}) => (
+  <View style={styles.items}>
+    {items.map((item, index) => (
+      <Item group={group} key={index} name={item} />
+    ))}
+  </View>
+));
+
+const Item = React.memo(({group, name}) => {
+  // 숫자를 나타낼 상태값 (임의로 추가한 예시)
+  const [prefNumber, setPrefNumber] = useState(null); // 숫자가 없으면 null 또는 0
+
+  const {
     onPressModalOpen,
     isModalVisible,
     addItemToPrefs,
     focusedItem,
     preferences,
     isCompleteItems,
-  }) => (
-    <View style={styles.items}>
-      {items.map((item, index) => (
-        <Item
-          group={group}
-          key={index}
-          name={item}
-          isModalVisible={isModalVisible}
-          onPressModalOpen={onPressModalOpen}
-          addItemToPrefs={addItemToPrefs}
-          focusedItem={focusedItem}
-          preferences={preferences}
-          isCompleteItems={isCompleteItems}
-        />
-      ))}
-    </View>
-  ),
-);
+  } = useContext(PreferencesContext);
 
-const Item = React.memo(
-  ({
+  const isCompleteItem = isCompleteItems
+    ? isCompleteItems[group]?.[name]
+    : null;
+
+  const onPressItem = useCallback(() => {
+    if (!isModalVisible && name !== unselectedName) {
+      onPressModalOpen({name, group});
+    } else if (name === unselectedName) {
+      // Do nothing or any other logic if name is unselected
+    } else {
+      addItemToPrefs(focusedItem, name);
+    }
+  }, [
+    addItemToPrefs,
+    focusedItem,
     group,
+    isModalVisible,
     name,
     onPressModalOpen,
-    isModalVisible,
-    addItemToPrefs,
-    focusedItem,
-    preferences,
-    isCompleteItems,
-  }) => {
-    // 숫자를 나타낼 상태값 (임의로 추가한 예시)
-    const [prefNumber, setPrefNumber] = React.useState(null); // 숫자가 없으면 null 또는 0
+  ]);
 
-    const isCompleteItem = isCompleteItems
-      ? isCompleteItems[group][name]
-      : null;
+  useEffect(() => {
+    if (focusedItem) {
+      const prefArrayOfFocusedItem =
+        preferences[focusedItem.group]?.[focusedItem.name] || [];
 
-    const onPressItem = useCallback(() => {
-      if (!isModalVisible && name !== unselectedName) {
-        onPressModalOpen({name, group});
-      } else if (name === unselectedName) {
-        // Do nothing or any other logic if name is unselected
+      const isSelectedItemInPrefs = prefArrayOfFocusedItem.includes(name);
+      const prefRanking = prefArrayOfFocusedItem.indexOf(name) + 1;
+
+      if (isSelectedItemInPrefs) {
+        setPrefNumber(prefRanking);
       } else {
-        addItemToPrefs(focusedItem, name);
+        setPrefNumber(null);
       }
-    }, [
-      addItemToPrefs,
-      focusedItem,
-      group,
-      isModalVisible,
-      name,
-      onPressModalOpen,
-    ]);
+    }
+  }, [preferences, focusedItem, name]);
 
-    useEffect(() => {
-      if (focusedItem) {
-        const prefArrayOfFocusedItem =
-          preferences[focusedItem.group]?.[focusedItem.name] || [];
+  return (
+    <View style={styles.item}>
+      <TouchableOpacity onPress={onPressItem} activeOpacity={0.6}>
+        <View style={styles.iconContainer}>
+          {/* 숫자가 있을 때만 표시되도록 설정 */}
+          {isModalVisible && prefNumber && (
+            <Text style={styles.itemNumber}>{prefNumber}</Text>
+          )}
 
-        const isSelectedItemInPrefs = prefArrayOfFocusedItem.includes(name);
-        const prefRanking = prefArrayOfFocusedItem.indexOf(name) + 1;
-
-        if (isSelectedItemInPrefs) {
-          setPrefNumber(prefRanking);
-        } else {
-          setPrefNumber(null);
-        }
-      }
-    }, [preferences, focusedItem, name]);
-
-    return (
-      <View style={styles.item}>
-        <TouchableOpacity onPress={onPressItem} activeOpacity={0.6}>
-          <View style={styles.iconContainer}>
-            {/* 숫자가 있을 때만 표시되도록 설정 */}
-            {prefNumber && <Text style={styles.itemNumber}>{prefNumber}</Text>}
-
-            <AutoHeightImage
-              width={48}
-              source={getIconSource(
-                name,
-                isModalVisible,
-                isCompleteItem,
-                prefNumber,
-              )}
-            />
-          </View>
-        </TouchableOpacity>
-        <Text style={styles.itemName}>
-          {name === unselectedName ? unselectedName : name}
-        </Text>
-      </View>
-    );
-  },
-);
+          <AutoHeightImage
+            width={48}
+            source={getIconSource(
+              name,
+              isModalVisible,
+              isCompleteItem,
+              prefNumber,
+            )}
+          />
+        </View>
+      </TouchableOpacity>
+      <Text style={styles.itemName}>
+        {name === unselectedName ? unselectedName : name}
+      </Text>
+    </View>
+  );
+});
 
 const styles = StyleSheet.create({
   preferenceGroup: {

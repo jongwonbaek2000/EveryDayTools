@@ -1,17 +1,15 @@
-import React, {useState} from 'react';
+import React, {useState, useContext, useEffect} from 'react';
 import {View, Text, TouchableOpacity, Modal, StyleSheet} from 'react-native';
 import PreferenceGroup from './PreferenceGroup';
 import palette from '../styles/colors/colorPalette';
+import {PreferencesContext} from '../providers/PreferencesProvider';
 
-const InputPreferenceModal = ({
-  focusedItem,
-  items,
-  onPressModalClose,
-  isModalVisible,
-  onPressModalOpen,
-  addItemToPrefs,
-  preferences,
-}) => {
+const InputPreferenceModal = ({allItems}) => {
+  const {focusedItem, onPressModalClose, isModalVisible} =
+    useContext(PreferencesContext);
+
+  const group = focusedItem.group === 'group1' ? 'group2Items' : 'group1Items';
+
   return (
     <Modal animationType="slide" visible={isModalVisible} transparent={true}>
       <View style={styles.modalView}>
@@ -30,12 +28,8 @@ const InputPreferenceModal = ({
             {focusedItem.group === 'group1' ? '매칭 그룹 2' : '매칭 그룹 1'}
           </Text>
           <PreferenceGroup
-            items={items}
-            isModalVisible={isModalVisible}
-            onPressModalOpen={onPressModalOpen}
-            addItemToPrefs={addItemToPrefs}
-            focusedItem={focusedItem}
-            preferences={preferences}
+            group={focusedItem.group === 'group1' ? 'group2' : 'group1'}
+            items={allItems[group]}
           />
         </View>
         <View
