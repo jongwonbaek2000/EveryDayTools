@@ -5,8 +5,13 @@ import palette from '../styles/colors/colorPalette';
 import {PreferencesContext} from '../providers/PreferencesProvider';
 
 const InputPreferenceModal = ({allItems}) => {
-  const {focusedItem, onPressModalClose, isModalVisible} =
-    useContext(PreferencesContext);
+  const {
+    focusedItem,
+    onPressModalClose,
+    isModalVisible,
+    onRemovePrefOfItem,
+    onPressRandomPref,
+  } = useContext(PreferencesContext);
 
   const group = focusedItem.group === 'group1' ? 'group2Items' : 'group1Items';
 
@@ -24,12 +29,22 @@ const InputPreferenceModal = ({allItems}) => {
             <Text style={{color: palette.primary}}>선호도가 높은 것부터</Text>{' '}
             순서대로 터치하세요!
           </Text>
-          <Text style={styles.modalGroupDescription}>
-            {focusedItem.group === 'group1' ? '매칭 그룹 2' : '매칭 그룹 1'}
-          </Text>
+          <View>
+            <Text style={styles.modalGroupDescription}>
+              {focusedItem.group === 'group1' ? '매칭 그룹 2' : '매칭 그룹 1'}
+            </Text>
+            <TouchableOpacity
+              onPress={() => onPressRandomPref(focusedItem)}
+              activeOpacity={0.6}
+              style={styles.smallButton}>
+              <Text style={styles.smallButtonText}>랜덤 선호도</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={{marginTop: 10}} />
           <PreferenceGroup
             group={focusedItem.group === 'group1' ? 'group2' : 'group1'}
             items={allItems[group]}
+            isModal={true}
           />
         </View>
         <View
@@ -42,7 +57,7 @@ const InputPreferenceModal = ({allItems}) => {
           }}>
           <TouchableOpacity
             activeOpacity={0.6}
-            onPress={onPressModalClose}
+            onPress={() => onRemovePrefOfItem(focusedItem)}
             style={styles.modalBottomButtonLeft}>
             <Text
               style={{fontSize: 16, color: palette.primary, margin: 'auto'}}>
@@ -84,6 +99,19 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+  },
+  smallButtonText: {marginTop: -2, fontSize: 12, color: palette.primary},
+  smallButton: {
+    position: 'absolute',
+    right: 0,
+    width: 80,
+    height: 30,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 12,
+    borderColor: palette.primary,
+    borderWidth: 1,
   },
   modalTitleText: {
     color: 'black',

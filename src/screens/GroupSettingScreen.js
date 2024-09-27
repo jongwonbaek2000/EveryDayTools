@@ -82,14 +82,14 @@ function GroupSetting({navigation}) {
       <View style={[styles.block, {width: '100%'}]}>
         <SettingBlock
           title="매칭 그룹 1"
-          description="더블 탭으로 입력하세요!"
+          description="더블 탭으로 이름 변경"
           mainNumber={groupNumber.group1}
           onPressUp={() => updateGroupNumber('group1', 1)}
           onPressDown={() => updateGroupNumber('group1', -1)}
         />
         <SettingBlock
           title="매칭 그룹 2"
-          description="더블 탭으로 입력하세요!"
+          description="더블 탭으로 이름 변경"
           mainNumber={groupNumber.group2}
           onPressUp={() => updateGroupNumber('group2', 1)}
           onPressDown={() => updateGroupNumber('group2', -1)}

@@ -12,14 +12,14 @@ const ICON_PATHS = {
   ACTIVATED_2: require('../../assets/icons/cell-icon-activated-2.png'),
 };
 
-const getIconSource = (name, isModalVisible, isCompleteItem, prefNumber) => {
+const getIconSource = (name, isModal, isCompleteItem, prefNumber) => {
   if (name === unselectedName) return ICON_PATHS.DEACTIVATED;
-  if (isModalVisible && prefNumber) return ICON_PATHS.ACTIVATED_2;
-  if (!isModalVisible && isCompleteItem) return ICON_PATHS.ACTIVATED;
+  if (isModal && prefNumber) return ICON_PATHS.ACTIVATED_2;
+  if (!isModal && isCompleteItem) return ICON_PATHS.ACTIVATED;
   return ICON_PATHS.DEFAULT;
 };
 
-const PreferenceGroup = ({group, title, subtitle, items}) => {
+const PreferenceGroup = ({group, title, subtitle, items, isModal}) => {
   // 10개 미만의 아이템일 경우 '미선택' 항목을 채워 넣음
   const fullItems = [...items];
   while (fullItems.length < 10) {
@@ -34,21 +34,21 @@ const PreferenceGroup = ({group, title, subtitle, items}) => {
           <Text style={styles.textSmall}>{subtitle}</Text>
         </View>
       )}
-      <ItemsRow group={group} items={fullItems.slice(0, 5)} />
-      <ItemsRow group={group} items={fullItems.slice(5)} />
+      <ItemsRow group={group} items={fullItems.slice(0, 5)} isModal={isModal} />
+      <ItemsRow group={group} items={fullItems.slice(5)} isModal={isModal} />
     </View>
   );
 };
 
-const ItemsRow = React.memo(({group, items}) => (
+const ItemsRow = React.memo(({group, items, isModal}) => (
   <View style={styles.items}>
     {items.map((item, index) => (
-      <Item group={group} key={index} name={item} />
+      <Item group={group} key={index} name={item} isModal={isModal} />
     ))}
   </View>
 ));
 
-const Item = React.memo(({group, name}) => {
+export const Item = React.memo(({group, name, isModal}) => {
   // 숫자를 나타낼 상태값 (임의로 추가한 예시)
   const [prefNumber, setPrefNumber] = useState(null); // 숫자가 없으면 null 또는 0
 
@@ -88,10 +88,10 @@ const Item = React.memo(({group, name}) => {
         preferences[focusedItem.group]?.[focusedItem.name] || [];
 
       const isSelectedItemInPrefs = prefArrayOfFocusedItem.includes(name);
-      const prefRanking = prefArrayOfFocusedItem.indexOf(name) + 1;
+      const prefRank = prefArrayOfFocusedItem.indexOf(name) + 1;
 
       if (isSelectedItemInPrefs) {
-        setPrefNumber(prefRanking);
+        setPrefNumber(prefRank);
       } else {
         setPrefNumber(null);
       }
@@ -103,18 +103,13 @@ const Item = React.memo(({group, name}) => {
       <TouchableOpacity onPress={onPressItem} activeOpacity={0.6}>
         <View style={styles.iconContainer}>
           {/* 숫자가 있을 때만 표시되도록 설정 */}
-          {isModalVisible && prefNumber && (
+          {isModal && prefNumber && (
             <Text style={styles.itemNumber}>{prefNumber}</Text>
           )}
 
           <AutoHeightImage
             width={48}
-            source={getIconSource(
-              name,
-              isModalVisible,
-              isCompleteItem,
-              prefNumber,
-            )}
+            source={getIconSource(name, isModal, isCompleteItem, prefNumber)}
           />
         </View>
       </TouchableOpacity>
@@ -167,7 +162,7 @@ const styles = StyleSheet.create({
   },
   itemName: {
     color: palette._7,
-    marginTop: 8,
+    marginTop: 1,
     fontSize: 12,
   },
 });

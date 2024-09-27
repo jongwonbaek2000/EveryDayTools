@@ -2,14 +2,17 @@ import React, {createContext, useState} from 'react';
 
 export const PreferencesContext = createContext();
 
-export const PreferencesProvider = ({children, groupNumber}) => {
+export const PreferencesProvider = ({
+  children,
+  groupNumber,
+  preferences,
+  isCompleteItems,
+  setPreferences,
+  setIsCompleteItems,
+}) => {
   const [focusedItem, setFocusedItem] = useState({name: '', group: 'group1'});
-  const [preferences, setPreferences] = useState({group1: {}, group2: {}});
+
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isCompleteItems, setIsCompleteItems] = useState({
-    group1: {},
-    group2: {},
-  });
 
   // 모달 열기 함수
   const onPressModalOpen = ({name, group}) => {
@@ -20,6 +23,50 @@ export const PreferencesProvider = ({children, groupNumber}) => {
   // 모달 닫기 함수
   const onPressModalClose = () => {
     setIsModalVisible(false);
+  };
+
+  const onPressRandomPref = item => {
+    setPreferences(prev => {
+      const oppositeGroup = item.group === 'group1' ? 'group2' : 'group1';
+
+      const randomOppositeItems =
+        Object.keys(prev[oppositeGroup]).sort(() => Math.random() - 0.5) || [];
+      const newPreferences = {
+        ...prev,
+        [item.group]: {
+          ...prev[item.group],
+          [item.name]: randomOppositeItems,
+        },
+      };
+      return newPreferences;
+    });
+    setIsCompleteItems(prev => ({
+      ...prev,
+      [item.group]: {
+        ...prev[item.group],
+        [item.name]: true,
+      },
+    }));
+  };
+
+  const onRemovePrefOfItem = item => {
+    setPreferences(prev => {
+      const newPreferences = {
+        ...prev,
+        [item.group]: {
+          ...prev[item.group],
+          [item.name]: null,
+        },
+      };
+      return newPreferences;
+    });
+    setIsCompleteItems(prev => ({
+      ...prev,
+      [item.group]: {
+        ...prev[item.group],
+        [item.name]: false,
+      },
+    }));
   };
 
   const addItemToPrefs = (item, selectedItem) => {
@@ -63,6 +110,8 @@ export const PreferencesProvider = ({children, groupNumber}) => {
     setIsModalVisible,
     isCompleteItems,
     addItemToPrefs,
+    onRemovePrefOfItem,
+    onPressRandomPref,
   };
 
   return (
