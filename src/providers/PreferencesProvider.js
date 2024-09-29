@@ -9,9 +9,11 @@ export const PreferencesProvider = ({
   isCompleteItems,
   setPreferences,
   setIsCompleteItems,
+  groupTitles,
+  setAllItems,
+  allItems,
 }) => {
   const [focusedItem, setFocusedItem] = useState({name: '', group: 'group1'});
-
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   // 모달 열기 함수
@@ -38,6 +40,7 @@ export const PreferencesProvider = ({
           [item.name]: randomOppositeItems,
         },
       };
+      console.log(preferences);
       return newPreferences;
     });
     setIsCompleteItems(prev => ({
@@ -112,6 +115,11 @@ export const PreferencesProvider = ({
     addItemToPrefs,
     onRemovePrefOfItem,
     onPressRandomPref,
+    groupTitles,
+    setAllItems,
+    allItems,
+    setPreferences,
+    setIsCompleteItems,
   };
 
   return (

@@ -48,7 +48,7 @@ const ItemsRow = React.memo(({group, items, isModal}) => (
   </View>
 ));
 
-export const Item = React.memo(({group, name, isModal}) => {
+const Item = React.memo(({group, name, isModal}) => {
   // 숫자를 나타낼 상태값 (임의로 추가한 예시)
   const [prefNumber, setPrefNumber] = useState(null); // 숫자가 없으면 null 또는 0
 

@@ -5,14 +5,13 @@ import {
   Text,
   StyleSheet,
   ActivityIndicator,
+  ScrollView, // ScrollView 추가
 } from 'react-native';
 import layout from '../styles/layouts/layout';
 import palette from '../styles/colors/colorPalette';
 import AutoHeightImage from 'react-native-auto-height-image';
 import deferredAcceptance from '../lib/deferredAcceptance';
-
-const lineBetweenOffset = 24;
-const lineBetweenHeight = 77;
+import BottomButton from '../components/BottomButton';
 
 const Item = React.memo(({name, onPressModalOpen}) => (
   <View style={styles.item}>
@@ -29,8 +28,10 @@ const Item = React.memo(({name, onPressModalOpen}) => (
 function OutputScreen({navigation, route}) {
   const lineBetweenOffset = 24;
   const lineBetweenHeight = 77;
-
-  const {group1, group2} = route.params;
+  // const {group1, group2} = route.params.preferences;
+  // const groupTitles = route.params.groupTitles;
+  const {preferences, groupTitles} = route.params || {};
+  const {group1, group2} = preferences || {};
 
   const [loading, setLoading] = useState(false);
   const [matchData, setMatchData] = useState({
@@ -68,23 +69,24 @@ function OutputScreen({navigation, route}) {
 
   useEffect(() => {
     doMatches();
-  }, [doMatches]);
+    console.log(unmatchedMen);
+  }, [doMatches, unmatchedMen]);
 
   const {matchedMen, matchedWomen, unmatchedMen, unmatchedWomen} = matchData;
 
   return (
     <View style={styles.container}>
       {loading ? ( // 로딩 중일 때 ActivityIndicator 표시
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color={palette.primary} />
       ) : (
-        <>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.textContainer}>
             <Text style={styles.text}>매칭된 아이템들</Text>
           </View>
           <View style={styles.line} />
           <View style={styles.textContainer}>
-            <Text style={styles.text}>매칭 그룹 1</Text>
-            <Text style={styles.text}>매칭 그룹 2</Text>
+            <Text style={styles.text}>{groupTitles.group1}</Text>
+            <Text style={styles.text}>{groupTitles.group2}</Text>
           </View>
           <View style={styles.line} />
           <View
@@ -117,11 +119,15 @@ function OutputScreen({navigation, route}) {
           </View>
           <View style={styles.line} />
           <View style={styles.textContainer}>
-            <Text style={styles.text}>매칭 그룹 1</Text>
-            <Text style={styles.text}>매칭 그룹 2</Text>
+            <Text style={styles.text}>{groupTitles.group1}</Text>
+            <Text style={styles.text}>{groupTitles.group2}</Text>
           </View>
           <View style={styles.line} />
-          <View style={styles.itemsContainer}>
+          <View
+            style={[
+              styles.itemsContainer,
+              {height: unmatchedMen.length * lineBetweenHeight + 40}, // 동적 높이 설정
+            ]}>
             <View style={styles.leftColumn}>
               {unmatchedMen.map((item, index) => (
                 <Item key={index} name={item} onPressModalOpen={() => {}} />
@@ -133,8 +139,12 @@ function OutputScreen({navigation, route}) {
               ))}
             </View>
           </View>
-        </>
+        </ScrollView>
       )}
+      <BottomButton
+        title="처음으로"
+        onPress={() => navigation.navigate('HomeTab')}
+      />
     </View>
   );
 }
@@ -147,6 +157,11 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     backgroundColor: 'white',
+  },
+  scrollContainer: {
+    flexGrow: 1, // ScrollView에 flexGrow 추가
+    alignItems: 'center',
+    marginBottom: 300,
   },
   textContainer: {
     marginTop: 20,
@@ -182,6 +197,10 @@ const styles = StyleSheet.create({
   item: {
     alignItems: 'center',
     marginBottom: 10,
+  },
+  itemName: {
+    color: palette._7,
+    fontSize: 12,
   },
 });
 

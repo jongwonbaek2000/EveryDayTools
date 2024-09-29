@@ -37,16 +37,15 @@ function initializePreferencesAndCompletes(groupNumber) {
 }
 
 function InputPreference({navigation, route}) {
-  const groupNumber = route.params;
+  const {groupTitles, groupNumber} = route.params;
   const {initialPreferences, initialIsCompleteItems, group1Items, group2Items} =
     initializePreferencesAndCompletes(groupNumber);
+  const [allItems, setAllItems] = useState({group1Items, group2Items});
   const [activeToNext, setActiveToNext] = useState(false);
   const [preferences, setPreferences] = useState(initialPreferences);
   const [isCompleteItems, setIsCompleteItems] = useState(
     initialIsCompleteItems,
   );
-
-  const allItems = {group1Items, group2Items};
 
   function areAllItemsTrue(preferencesItemsBoolean) {
     // 기존 로직: 모든 값이 true인지 확인
@@ -62,9 +61,13 @@ function InputPreference({navigation, route}) {
       setActiveToNext(false);
     }
   }, [isCompleteItems]);
-
+  useEffect(() => {
+    console.log(preferences);
+  });
   const onPressToNext = () => {
-    if (activeToNext) return navigation.navigate('Output', preferences);
+    if (activeToNext) {
+      return navigation.navigate('Output', {groupTitles, preferences});
+    }
   };
 
   return (
@@ -73,23 +76,26 @@ function InputPreference({navigation, route}) {
       isCompleteItems={isCompleteItems}
       setPreferences={setPreferences}
       setIsCompleteItems={setIsCompleteItems}
-      groupNumber={groupNumber}>
+      groupNumber={groupNumber}
+      groupTitles={groupTitles}
+      setAllItems={setAllItems}
+      allItems={allItems}>
       <View style={styles.container}>
         <View style={styles.mainArea}>
           <PreferenceGroup
             group="group1"
-            title="매칭 그룹 1 선호도"
+            title={`${groupTitles.group1} 선호도`}
             subtitle="번호를 탭하세요!"
-            items={group1Items}
+            items={allItems.group1Items}
           />
           <PreferenceGroup
             group="group2"
-            title="매칭 그룹 2 선호도"
+            title={`${groupTitles.group2} 선호도`}
             subtitle="번호를 탭하세요!"
-            items={group2Items}
+            items={allItems.group2Items}
           />
         </View>
-        <InputPreferenceModal allItems={allItems} />
+        <InputPreferenceModal />
 
         <BottomButton
           isActive={activeToNext}

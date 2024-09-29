@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
 import palette from '../styles/colors/colorPalette';
 import layout from '../styles/layouts/layout';
-
+import {NavigationContext} from '../providers/NavigationProvider';
+import {useFocusEffect} from '@react-navigation/native'; // useFocusEffect 사용
 const HomeBlockImage = () => (
   <Image
     style={styles.blockImage}
@@ -32,18 +33,34 @@ const HomeBlock = ({title, description, inputDescription, onPress}) => (
   </TouchableOpacity>
 );
 
-const HomeTabScreen = ({navigation}) => (
-  <View style={styles.container}>
-    <Text style={styles.headerText}>일상의 툴들</Text>
-    <View style={styles.headerLine} />
-    <HomeBlock
-      title="선호도 매칭"
-      description="소개팅, 직원과 지점 매칭, 기숙사 배정, 장기 기증 등의 문제에 활용 가능!"
-      inputDescription="신청자 개수, 선택자 개수, 각 신청자와 선택자의 선호도"
-      onPress={() => navigation.navigate('Algorithm')}
-    />
-  </View>
-);
+const HomeTabScreen = ({navigation}) => {
+  const {headerShown, setHeaderShown} = useContext(NavigationContext);
+
+  // HomeTabScreen이 포커스될 때마다 헤더를 업데이트
+  useFocusEffect(
+    React.useCallback(() => {
+      setHeaderShown({tab: true, stack: false}); // 탭에서 헤더 표시
+    }, [setHeaderShown]),
+  );
+
+  const onPress = () => {
+    setHeaderShown({tab: false, stack: true});
+    navigation.navigate('Algorithm');
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.headerText}>일상의 툴들</Text>
+      <View style={styles.headerLine} />
+      <HomeBlock
+        title="선호도 매칭"
+        description="소개팅, 직원과 지점 매칭, 기숙사 배정, 장기 기증 등의 문제에 활용 가능!"
+        inputDescription="신청자 개수, 선택자 개수, 각 신청자와 선택자의 선호도"
+        onPress={onPress}
+      />
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {

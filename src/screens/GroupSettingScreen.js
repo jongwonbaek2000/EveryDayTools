@@ -4,8 +4,8 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  TextInput,
   Image,
-  PlatformColor,
 } from 'react-native';
 import palette from '../styles/colors/colorPalette';
 import BottomButton from '../components/BottomButton';
@@ -41,12 +41,29 @@ function SettingBlock({
   mainNumber,
   onPressUp,
   onPressDown,
+  onLongPressTitle, // 꾹 누르기 핸들러 추가
+  isEditing,
+  onChangeTitle,
+  onSubmitTitle,
 }) {
   return (
     <View style={styles.box}>
       <View style={styles.textBox}>
         <View style={styles.row}>
-          <Text style={styles.largeText}>{title}</Text>
+          <TouchableOpacity onLongPress={onLongPressTitle}>
+            {isEditing ? (
+              <TextInput
+                style={styles.largeText}
+                value={title}
+                onChangeText={onChangeTitle}
+                onBlur={onSubmitTitle}
+                onSubmitEditing={onSubmitTitle}
+                autoFocus // 텍스트 입력 시 자동으로 키보드 활성화
+              />
+            ) : (
+              <Text style={styles.largeText}>{title}</Text>
+            )}
+          </TouchableOpacity>
           <Image
             source={require('../../assets/icons/edit.png')}
             style={styles.edit}
@@ -69,6 +86,13 @@ function GroupSetting({navigation}) {
     group2: 5,
   });
 
+  const [groupTitles, setGroupTitles] = useState({
+    group1: '매칭 그룹 1',
+    group2: '매칭 그룹 2',
+  });
+
+  const [editingGroup, setEditingGroup] = useState(null); // 현재 수정 중인 그룹
+
   // 그룹 넘버 업데이트 핸들러 함수
   const updateGroupNumber = (group, delta) => {
     setGroupNumber(prev => ({
@@ -77,27 +101,53 @@ function GroupSetting({navigation}) {
     }));
   };
 
+  // 그룹 이름 수정 핸들러
+  const handleLongPress = group => {
+    setEditingGroup(group); // 꾹 누르기 시 편집 모드 활성화
+  };
+
+  const handleChangeTitle = (group, newTitle) => {
+    setGroupTitles(prev => ({
+      ...prev,
+      [group]: newTitle,
+    }));
+  };
+
+  const handleSubmitTitle = () => {
+    setEditingGroup(null); // 입력 완료 시 편집 모드 종료
+  };
+
   return (
     <View style={styles.block}>
       <View style={[styles.block, {width: '100%'}]}>
         <SettingBlock
-          title="매칭 그룹 1"
-          description="더블 탭으로 이름 변경"
+          title={groupTitles.group1}
+          description="꾹 눌러 이름 변경"
           mainNumber={groupNumber.group1}
           onPressUp={() => updateGroupNumber('group1', 1)}
           onPressDown={() => updateGroupNumber('group1', -1)}
+          onLongPressTitle={() => handleLongPress('group1')} // 더블 탭 대신 꾹 누르기
+          isEditing={editingGroup === 'group1'}
+          onChangeTitle={text => handleChangeTitle('group1', text)}
+          onSubmitTitle={handleSubmitTitle}
         />
         <SettingBlock
-          title="매칭 그룹 2"
-          description="더블 탭으로 이름 변경"
+          title={groupTitles.group2}
+          description="꾹 눌러 이름 변경"
           mainNumber={groupNumber.group2}
           onPressUp={() => updateGroupNumber('group2', 1)}
           onPressDown={() => updateGroupNumber('group2', -1)}
+          onLongPressTitle={() => handleLongPress('group2')} // 더블 탭 대신 꾹 누르기
+          isEditing={editingGroup === 'group2'}
+          onChangeTitle={text => handleChangeTitle('group2', text)}
+          onSubmitTitle={handleSubmitTitle}
         />
       </View>
       <BottomButton
         title="그룹 세팅"
-        onPress={() => navigation.navigate('InputPreference', groupNumber)}
+        onPress={() =>
+          navigation.navigate('InputPreference', {groupTitles, groupNumber})
+        }
       />
     </View>
   );
@@ -113,7 +163,6 @@ const styles = StyleSheet.create({
     borderColor: palette._d9,
     borderWidth: 1,
     width: `${layout.widthSystem * 100}%`,
-    // marginHorizontal: 'auto',
     minHeight: 140,
     borderRadius: 12,
     alignItems: 'center',

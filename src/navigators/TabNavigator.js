@@ -1,5 +1,5 @@
 //basics
-import React from 'react';
+import React, {useContext} from 'react';
 import {View, Text, Button, StyleSheet, Image} from 'react-native';
 
 //navigation
@@ -10,16 +10,18 @@ import palette from '../styles/colors/colorPalette';
 
 //screens
 import HomeTabScreen from '../screens/HomeTabScreen';
-import AlgorithmTabScreen from '../screens/AlgorithmTabScreen';
+import InfoTabScreen from '../screens/InfoTabScreen';
+import {NavigationContext} from '../providers/NavigationProvider';
 
 const Tab = createBottomTabNavigator();
 
 function TabNavigator() {
+  const {headerShown, setHeaderShown} = useContext(NavigationContext);
   return (
     <Tab.Navigator
       initialRouteName="HomeTab"
       screenOptions={{
-        headerShown: false,
+        headerShown: headerShown.tab,
         tabBarStyle: {height: 60},
         tabBarLabelStyle: {fontSize: 12, paddingBottom: 6},
         tabBarActiveTintColor: palette.primary,
@@ -42,10 +44,10 @@ function TabNavigator() {
         }}
       />
       <Tab.Screen
-        name="AlgorithmTab"
-        component={AlgorithmTabScreen}
+        name="InfoTab"
+        component={InfoTabScreen}
         options={{
-          title: '알고리즘',
+          title: '정보',
           tabBarIcon: ({focused}) =>
             focused ? (
               <Image
