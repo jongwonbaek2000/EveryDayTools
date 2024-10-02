@@ -4,7 +4,7 @@ import palette from '../styles/colors/colorPalette';
 
 const InfoTabScreen = () => {
   const handlePress = async () => {
-    const url = 'http://www.google.com'; // 간단한 HTTP URL 테스트
+    const url = 'http://github.com/jongwonbaek2000?tab=repositories'; // 간단한 HTTP URL 테스트
     const supported = await Linking.canOpenURL(url);
 
     console.log(`URL 지원 여부: ${supported}`); // URL 지원 여부 로그 추가

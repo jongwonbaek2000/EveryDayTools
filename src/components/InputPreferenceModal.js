@@ -7,6 +7,8 @@ import {
   StyleSheet,
   TextInput,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import PreferenceGroup from './PreferenceGroup';
 import palette from '../styles/colors/colorPalette';
@@ -160,89 +162,95 @@ const InputPreferenceModal = () => {
 
   return (
     <Modal animationType="slide" visible={isModalVisible} transparent={true}>
-      <View style={styles.modalView}>
-        <View style={{width: '90%'}}>
-          <View>
-            {isItemNameInput ? (
-              <TextInput
-                returnKeyType="done"
-                style={[
-                  styles.itemName,
-                  {marginTop: 10, marginHorizontal: 'auto'},
-                ]}
-                value={itemName}
-                placeholder={itemName}
-                placeholderTextColor={palette.primary}
-                onChangeText={onChangeItemName}
-                onBlur={onSubmitItemName}
-                onSubmitEditing={onSubmitItemName}
-                maxLength={Math.max(MAX_KOREAN_LENGTH, MAX_ENGLISH_LENGTH)} // 최대 길이 설정
-                autoFocus
-              />
-            ) : (
-              <Text style={styles.modalTitleText}>
-                <Text style={styles.itemName}>{focusedItem.name}</Text>의 선호도
-              </Text>
-            )}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{flex: 1}} // 전체 화면을 덮도록 설정
+      >
+        <View style={styles.modalView}>
+          <View style={{width: '90%'}}>
+            <View>
+              {isItemNameInput ? (
+                <TextInput
+                  returnKeyType="done"
+                  style={[
+                    styles.itemName,
+                    {marginTop: 10, marginHorizontal: 'auto'},
+                  ]}
+                  value={itemName}
+                  placeholder={itemName}
+                  placeholderTextColor={palette.primary}
+                  onChangeText={onChangeItemName}
+                  onBlur={onSubmitItemName}
+                  onSubmitEditing={onSubmitItemName}
+                  maxLength={Math.max(MAX_KOREAN_LENGTH, MAX_ENGLISH_LENGTH)} // 최대 길이 설정
+                  autoFocus
+                />
+              ) : (
+                <Text style={styles.modalTitleText}>
+                  <Text style={styles.itemName}>{focusedItem.name}</Text>의
+                  선호도
+                </Text>
+              )}
 
+              <TouchableOpacity
+                onPress={() => setIsItemNameInput(true)}
+                activeOpacity={0.6}
+                style={[styles.smallButton, {marginTop: 20}]}>
+                <Text style={styles.smallButtonText}>이름 변경</Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.modalDescription}>
+              <Text style={{color: palette.primary}}>선호도가 높은 것부터</Text>{' '}
+              순서대로 터치하세요!
+            </Text>
+            <View>
+              <Text style={styles.modalGroupDescription}>
+                {focusedItem.group === 'group1'
+                  ? groupTitles.group2
+                  : groupTitles.group1}
+              </Text>
+              <TouchableOpacity
+                onPress={() => onPressRandomPref(focusedItem)}
+                activeOpacity={0.6}
+                style={styles.smallButton}>
+                <Text style={styles.smallButtonText}>랜덤 선호도</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{marginTop: 10}} />
+            <PreferenceGroup
+              group={focusedItem.group === 'group1' ? 'group2' : 'group1'}
+              items={allItems[displayGroup]}
+              isModal={true}
+            />
+          </View>
+          <View
+            style={{
+              width: '100%',
+              position: 'absolute',
+              bottom: 20,
+              flexDirection: 'row',
+              justifyContent: 'space-evenly',
+            }}>
             <TouchableOpacity
-              onPress={() => setIsItemNameInput(true)}
               activeOpacity={0.6}
-              style={[styles.smallButton, {marginTop: 20}]}>
-              <Text style={styles.smallButtonText}>이름 변경</Text>
+              onPress={() => onRemovePrefOfItem(focusedItem)}
+              style={styles.modalBottomButtonLeft}>
+              <Text
+                style={{fontSize: 16, color: palette.primary, margin: 'auto'}}>
+                되돌리기
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity={0.6}
+              onPress={onPressModalClose}
+              style={styles.modalBottomButtonRight}>
+              <Text style={{fontSize: 16, color: 'white', margin: 'auto'}}>
+                저장
+              </Text>
             </TouchableOpacity>
           </View>
-          <Text style={styles.modalDescription}>
-            <Text style={{color: palette.primary}}>선호도가 높은 것부터</Text>{' '}
-            순서대로 터치하세요!
-          </Text>
-          <View>
-            <Text style={styles.modalGroupDescription}>
-              {focusedItem.group === 'group1'
-                ? groupTitles.group2
-                : groupTitles.group1}
-            </Text>
-            <TouchableOpacity
-              onPress={() => onPressRandomPref(focusedItem)}
-              activeOpacity={0.6}
-              style={styles.smallButton}>
-              <Text style={styles.smallButtonText}>랜덤 선호도</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={{marginTop: 10}} />
-          <PreferenceGroup
-            group={focusedItem.group === 'group1' ? 'group2' : 'group1'}
-            items={allItems[displayGroup]}
-            isModal={true}
-          />
         </View>
-        <View
-          style={{
-            width: '100%',
-            position: 'absolute',
-            bottom: 20,
-            flexDirection: 'row',
-            justifyContent: 'space-evenly',
-          }}>
-          <TouchableOpacity
-            activeOpacity={0.6}
-            onPress={() => onRemovePrefOfItem(focusedItem)}
-            style={styles.modalBottomButtonLeft}>
-            <Text
-              style={{fontSize: 16, color: palette.primary, margin: 'auto'}}>
-              되돌리기
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            activeOpacity={0.6}
-            onPress={onPressModalClose}
-            style={styles.modalBottomButtonRight}>
-            <Text style={{fontSize: 16, color: 'white', margin: 'auto'}}>
-              저장
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };
